@@ -12,7 +12,7 @@ Otherwise it might be more useful to plan the distribution and include the maste
 ## Install
 Run the following command in this directory
 ```bash
-pip install -e .
+> pip install -e .
 ```
 
 ## Usage
@@ -35,5 +35,19 @@ if __name__ == "__main__":
 ```
 
 ```bash
-mpirun -n 4 python simple_script.py
+> mpirun -n 4 python simple_script.py
+[1] func(1)
+[1] func(4)
+[1] func(7)
+[1] Result: None
+[3] func(0)
+[3] func(3)
+[3] func(6)
+[3] func(9)
+[3] Result: None
+[2] func(2)
+[2] func(5)
+[2] func(8)
+[2] Result: None
+[0] Result: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 ```
