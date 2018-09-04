@@ -21,7 +21,7 @@ def parallel_map(func: Callable, iteratable: List, **kwargs) -> List:
     Return values of func are passed put on master.
     """
     if SIZE == 1:
-        raise ValueError("Script needs at least 2 process to run.")
+        raise ValueError("Script needs at least 2 processes to run.")
 
     results = []
     task_order = []
