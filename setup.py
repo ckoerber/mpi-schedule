@@ -29,4 +29,6 @@ setup(
     packages=["mpischedule"],
     test_suite="tests",
     install_requires=REQUIREMENTS,
+    url="https://github.com/ckoerber/mpi-schedule",
+    keywords="mpi task scheduling",
 )
