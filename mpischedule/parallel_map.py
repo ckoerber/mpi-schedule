@@ -50,15 +50,10 @@ def parallel_map(func: Callable, iteratable: List, **kwargs) -> List:
     local_res = COMM.gather(results, root=MASTER)
     local_ind = COMM.gather(task_order, root=MASTER)
     if IS_MASTER:
-        result = []
-        for res in local_res:
-            result += res
-
-        index = []
-        for ind in local_ind:
-            index += ind
-
-        out = [result[i] for i in index]
+        out = [None] * len(iteratable)
+        for res, inds in zip(local_res, local_ind):
+            for val, ind in zip(res, inds):
+                out[ind] = val
 
     return out
 
