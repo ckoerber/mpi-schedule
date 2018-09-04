@@ -2,6 +2,7 @@
 """
 from unittest import TestCase
 
+from mpischedule.base import IS_MASTER
 from mpischedule.parallel_map import parallel_map
 
 
@@ -15,7 +16,10 @@ class TestParallelMap(TestCase):
         x = range(20)
         func = lambda x: x ** 2
 
-        result = map(func, x)
+        result = list(map(func, x))
         parallel_result = parallel_map(func, x)
 
-        self.assertListEqual(result, parallel_result)
+        if IS_MASTER:
+            self.assertSequenceEqual(result, parallel_result)
+        else:
+            self.assertIs(None, parallel_result)

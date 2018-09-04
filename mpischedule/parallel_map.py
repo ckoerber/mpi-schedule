@@ -8,7 +8,8 @@ from mpischedule.base import COMM
 from mpischedule.base import RANK
 from mpischedule.base import SIZE
 from mpischedule.base import MASTER
-from mpischedule.base import SLAVE
+from mpischedule.base import IS_SLAVE
+from mpischedule.base import IS_MASTER
 
 
 def parallel_map(func: Callable, iteratable: List, **kwargs) -> List:
@@ -19,11 +20,13 @@ def parallel_map(func: Callable, iteratable: List, **kwargs) -> List:
 
     Return values of func are passed put on master.
     """
+    if SIZE == 1:
+        raise ValueError("Script needs at least 2 process to run.")
 
     results = []
     task_order = []
 
-    if SLAVE:
+    if IS_SLAVE:
 
         task_id = _get_new_task_id()
         while not task_id is None:
@@ -36,21 +39,23 @@ def parallel_map(func: Callable, iteratable: List, **kwargs) -> List:
         todo = list(range(len(iteratable)))
         while todo:
             rank = COMM.recv(source=MPI.ANY_SOURCE)
-            task_id = todo.pop()
+            task_id = todo.pop(0)
             COMM.isend(task_id, dest=rank, tag=rank)
 
         # Send break up criterion
         for rank in range(SIZE):
             COMM.isend(None, dest=rank, tag=rank)
 
-    result = []
-    index = []
     out = None
-    if MASTER:
-        for res in COMM.gather(results, root=MASTER):
+    local_res = COMM.gather(results, root=MASTER)
+    local_ind = COMM.gather(task_order, root=MASTER)
+    if IS_MASTER:
+        result = []
+        for res in local_res:
             result += res
 
-        for ind in COMM.gather(task_order, root=MASTER):
+        index = []
+        for ind in local_ind:
             index += ind
 
         out = [result[i] for i in index]
